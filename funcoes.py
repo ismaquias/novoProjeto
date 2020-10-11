@@ -64,7 +64,7 @@ def buscar_veiculo(bd_path, placa, opCod=1):
 def listar_veiculos(bd_path):
 	try:
 		# abrindo conexão com a BD
-		bd = open(bd_path)
+		bd = open(bd_path, "a+")
 		# passando as informações da BD para uma lista
 		carros = bd.readlines()
 
@@ -73,6 +73,7 @@ def listar_veiculos(bd_path):
 			print("###  LISTA VAZIA!  ###")
 
 		# imprimindo o cabeçalho da tabela
+		if (len(carros) != 0):
 		print("{}{}{}{}".format("MARCA".ljust(15,"_"), "MODELO".ljust(15,"_"), "ANO".ljust(8,"_"), "PLACA".ljust(8,"_")))
 		
 		# iterando sobre os veículos imprimindo-os
