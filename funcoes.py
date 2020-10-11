@@ -4,6 +4,13 @@ import os
 def limpar_tela():
 	os.system("cls" if os.name == "nt" else "clear")
 
+# função para calcular valor do serviço
+def calcular_valor(nRodas):
+	valor = 1
+	for i in range(nRodas):
+		valor *= i
+	return valor
+
 # função para cadastrar veículos
 def cadastrar_veiculo(bd_path):
 	limpar_tela()
