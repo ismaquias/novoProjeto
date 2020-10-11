@@ -7,7 +7,7 @@ def limpar_tela():
 # função para calcular valor do serviço
 def calcular_valor(nRodas):
 	valor = 1
-	for i in range(1,nRodas):
+	for i in range(1,nRodas+1):
 		valor *= i
 	return valor
 
@@ -20,7 +20,8 @@ def cadastrar_veiculo(bd_path):
 	modelo = input("Modelo do veídulo: ")
 	ano = input("Ano do veículo: ")
 	placa = input("Placa do veículo (ABC1234): ")
-	nPneus = int(input("Quantidade de pneus do veículo: "))
+	nPneus = input("Quantidade de pneus do veículo (padrão:4): ")
+	nPneus = 4 if nPneus == "" else int(nPneus)
 
 	# verificando se o veículo já existe na BD
 	if buscar_veiculo(bd_path,placa.upper(), opCod=1):
@@ -50,7 +51,7 @@ def listar_veiculos(bd_path):
 
 		# verificando se existem veículos na BD
 		if len(carros) == 0:
-			print("### LISTA VAZIA! ###\n")
+			print("\n### LISTA VAZIA! ###")
 
 		# imprimindo o cabeçalho da tabela
 		if (len(carros) != 0):
@@ -74,11 +75,10 @@ def listar_veiculos(bd_path):
 def buscar_veiculo(bd_path, placa, opCod=0):
 	#opCod=0: busca normal
 	#opCod=1: desativa msg de lista vazia
-	#opCod=2: chama editar_veiculo
-	#opCod=3: chama deletar_veiculo 
+	#opCod=2: chama editar_veiculo()
+	#opCod=3: chama deletar_veiculo (0)
 	
 	limpar_tela()
-	print("Buscando placa {}\n".format(placa))
 
 	try:
 		# abrindo conexão com a BD
@@ -87,25 +87,31 @@ def buscar_veiculo(bd_path, placa, opCod=0):
 		carros = bd.readlines()
 
 		# verificando se existem veículos na BD
-		if len(carros) == 0 and opCod == 0:
-			print("### LISTA VAZIA! ###\n")
+		if len(carros) == 0 and opCod != 1:
+			print("\n### LISTA VAZIA! ###")
 			return False
 
+		print("\nBuscando placa {}".format(placa))
 		# iterando sobre os veículos em busca do match
 		for car in carros:
 			if placa in car:
-				if opCod == 0 or opCod == 1:
-					return car
-				elif opCod == 2:
-					car = editar_veiculo()
-					break
-				elif opCod == 3:
-					carros = deletar_veiculo(carros,placa)
-					bd.close()
-					bd.open(bd_path,"w")
-					for car in carros:
-						bd.write(car)
-					break
+				while True:
+					if opCod == 0 or opCod == 1:
+						return car
+					elif opCod == 2:
+						car = editar_veiculo()
+						print("\n### VEÍCULO EDITADO ###")
+						op = input("\n[Enter Para Voltar] ")
+					elif opCod == 3:
+						carros = deletar_veiculo(carros,placa)
+						bd.close()
+						bd = open(bd_path,"w")
+						for car in carros:
+							bd.write(car)
+						print("\n### VEÍCULO DELETADO ###")
+						op = input("\n[Enter Para Voltar] ")
+					if op == "":
+						break
 
 	except FileNotFoundError:
 		print("### BASE DE DADOS NÃO ENCONTRADA! ###")
@@ -124,13 +130,14 @@ def editar_veiculo():
 	modelo = input("Modelo do veídulo: ")
 	ano = input("Ano do veículo: ")
 	placa = input("Placa do veículo (ABC1234): ")
-	nPneus = int(input("Quantidade de pneus do veículo: "))
+	nPneus = input("Quantidade de pneus do veículo (padrão:4): ")
+	nPneus = 4 if nPneus == "" else int(nPneus)
 	return "{},{},{},{},{}\n".format(marca.upper(),modelo.upper(),ano,placa.upper(),calcular_valor(nPneus))
 
 # função para deletar veículos
 def deletar_veiculo(carros, placa):
 		# iterando sobre a lista
-		for car in carros):
+		for car in carros:
 			# verificando match da placa
 			if placa in car:
 				# removendo veículo encontrado
