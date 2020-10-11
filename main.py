@@ -1,3 +1,6 @@
+"""
+programa para cadastrar, buscar, deletar e listar veículos de lava a jato.
+"""
 from funcoes import *
 
 bd_path = "file.txt"
