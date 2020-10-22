@@ -84,40 +84,43 @@ def buscar_veiculo(bd_path, placa, opCod=0):
 		# abrindo conexão com a BD
 		bd = open(bd_path)
 		# passando as informações da BD para uma lista
-		carros = bd.readlines()
+		veiculos = bd.readlines()
 
 		# verificando se existem veículos na BD
-		if len(carros) == 0 and opCod != 1:
+		if len(veiculos) == 0 and opCod != 1:
 			print("\n### LISTA VAZIA! ###")
 			return False
 
 		print("\nBuscando placa {}".format(placa))
 		# iterando sobre os veículos em busca do match
-		for car in carros:
-			if placa in car:
+		for veiculo in veiculos:
+			if placa in veiculo:
 				while True:
 					if opCod == 0 or opCod == 1:
-						return car
+						return veiculo
 					elif opCod == 2:
-						car = editar_veiculo()
+						veiculo_editado = editar_veiculo()
+						index = veiculos.index(veiculo)
+						veiculos[index] = veiculo_editado
 						print("\n### VEÍCULO EDITADO ###")
-						op = input("\n[Enter Para Voltar] ")
-					elif opCod == 3:
-						carros = deletar_veiculo(carros,placa)
-						bd.close()
-						bd = open(bd_path,"w")
-						for car in carros:
-							bd.write(car)
-						print("\n### VEÍCULO DELETADO ###")
-						op = input("\n[Enter Para Voltar] ")
-					if op == "":
+						op = input("\n[Aperte qualquer techa para voltar] ")
 						break
-
+					elif opCod == 3:
+						veiculos = deletar_veiculo(veiculos,placa)
+						print("\n### VEÍCULO DELETADO ###")
+						op = input("\n[Aperte qualquer techa para voltar] ")
+						break
 	except FileNotFoundError:
 		print("### BASE DE DADOS NÃO ENCONTRADA! ###")
 		bd = open(bd_path,"w")
 		print("### BASE DE DADOS CRIADA! ###")
 	finally:
+		# granvando novas informações na BD se foi feita alguma alteração
+		if opCod == 2 or opCod == 3:
+			bd.close()
+			bd = open(bd_path,"w")
+			for v in veiculos:
+				bd.write(v)
 		# fechando conexão com a BD
 		bd.close()
 
@@ -135,12 +138,12 @@ def editar_veiculo():
 	return "{},{},{},{},{}\n".format(marca.upper(),modelo.upper(),ano,placa.upper(),calcular_valor(nPneus))
 
 # função para deletar veículos
-def deletar_veiculo(carros, placa):
+def deletar_veiculo(veiculos, placa):
 		# iterando sobre a lista
-		for car in carros:
+		for v in veiculos:
 			# verificando match da placa
-			if placa in car:
+			if placa in v:
 				# removendo veículo encontrado
-				carros.remove(car)
-				return carros
+				veiculos.remove(v)
+				return veiculos
 		return False
